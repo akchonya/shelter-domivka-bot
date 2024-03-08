@@ -1,39 +1,30 @@
-from typing import Optional
+from __future__ import annotations
 
-from sqlalchemy import String
-from sqlalchemy import text, BIGINT, Boolean, true
+from aiogram import html
+from aiogram.types import User
+from aiogram.utils.link import create_tg_link
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .base import Base, TimestampMixin, TableNameMixin
+from .base import Base, Int64, TimestampMixin
 
 
-class User(Base, TimestampMixin, TableNameMixin):
-    """
-    This class represents a User in the application.
+class DBUser(Base, TimestampMixin):
+    __tablename__ = "users"
 
-    Attributes:
-        user_id (Mapped[int]): The unique identifier of the user.
-        username (Mapped[Optional[str]]): The username of the user.
-        full_name (Mapped[str]): The full name of the user.
-        active (Mapped[bool]): Indicates whether the user is active or not.
-        language (Mapped[str]): The language preference of the user.
+    id: Mapped[Int64] = mapped_column(primary_key=True, nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False)
 
-    Methods:
-        __repr__(): Returns a string representation of the User object.
+    @property
+    def url(self) -> str:
+        return create_tg_link("user", id=self.id)
 
-    Inherited Attributes:
-        Inherits from Base, TimestampMixin, and TableNameMixin classes, which provide additional attributes and functionality.
+    @property
+    def mention(self) -> str:
+        return html.link(value=self.name, link=self.url)
 
-    Inherited Methods:
-        Inherits methods from Base, TimestampMixin, and TableNameMixin classes, which provide additional functionality.
-
-    """
-
-    user_id: Mapped[int] = mapped_column(BIGINT, primary_key=True, autoincrement=False)
-    username: Mapped[Optional[str]] = mapped_column(String(128))
-    full_name: Mapped[str] = mapped_column(String(128))
-    active: Mapped[bool] = mapped_column(Boolean, server_default=true())
-    language: Mapped[str] = mapped_column(String(10), server_default=text("'en'"))
-
-    def __repr__(self):
-        return f"<User {self.user_id} {self.username} {self.full_name}>"
+    @classmethod
+    def from_aiogram(cls, user: User) -> DBUser:
+        return DBUser(
+            id=user.id,
+            name=user.full_name,
+        )

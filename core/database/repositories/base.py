@@ -1,14 +1,10 @@
+from __future__ import annotations
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class BaseRepo:
-    """
-    A class representing a base repository for handling database operations.
+class BaseRepository:
+    _session: AsyncSession
 
-    Attributes:
-        session (AsyncSession): The database session used by the repository.
-
-    """
-
-    def __init__(self, session):
-        self.session: AsyncSession = session
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session

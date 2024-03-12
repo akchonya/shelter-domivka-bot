@@ -7,11 +7,13 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from core.handlers.user import router as user_router
 from core.utils.config import AppConfig, create_config
+from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
 
 async def main() -> None:
     config: AppConfig = create_config()
     dp: Dispatcher = Dispatcher()
+    dp.callback_query.middleware(CallbackAnswerMiddleware())
     dp.include_routers(user_router)
     # Initialize Bot instance with a default parse mode which will be passed to all API calls
     bot = Bot(

@@ -7,7 +7,29 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from core.handlers.user import router as user_router
 from core.utils.config import AppConfig, create_config
+from core.middleware.config import ConfigMiddleware
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
+
+
+def register_global_middlewares(dp: Dispatcher, config: AppConfig, session_pool=None):
+    """
+    Register global middlewares for the given dispatcher.
+    Global middlewares here are the ones that are applied to all the handlers (you specify the type of update)
+
+    :param dp: The dispatcher instance.
+    :type dp: Dispatcher
+    :param config: The configuration object from the loaded configuration.
+    :param session_pool: Optional session pool object for the database using SQLAlchemy.
+    :return: None
+    """
+    middleware_types = [
+        ConfigMiddleware(config),
+        # DatabaseMiddleware(session_pool),
+    ]
+
+    for middleware_type in middleware_types:
+        dp.message.outer_middleware(middleware_type)
+        dp.callback_query.outer_middleware(middleware_type)
 
 
 async def main() -> None:
@@ -20,6 +42,9 @@ async def main() -> None:
         token=config.bot.token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
+
+    register_global_middlewares(dp, config)
+
     # And the run events dispatching
     await dp.start_polling(bot)
 

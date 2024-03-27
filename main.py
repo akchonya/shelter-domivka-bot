@@ -5,9 +5,9 @@ import sys
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from core.handlers.user import router as user_router
-from core.utils.config import AppConfig, create_config
-from core.middleware.config import ConfigMiddleware
+from bot.handlers.user import router as user_router
+from bot.utils.config import AppConfig, create_config
+from bot.middlewares.config import ConfigMiddleware
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
 

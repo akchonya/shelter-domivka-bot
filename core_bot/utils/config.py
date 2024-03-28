@@ -1,7 +1,8 @@
-from pydantic import SecretStr, BaseModel
+from pydantic import SecretStr, BaseModel, Field
 from pydantic_settings import BaseSettings as _BaseSettings
 from pydantic_settings import SettingsConfigDict
 from sqlalchemy import URL
+from typing import List, Any
 
 
 class BaseSettings(_BaseSettings):
@@ -17,10 +18,10 @@ class BotConfig(BaseSettings, env_prefix="BOT_"):
 
     token: SecretStr
     drop_pending_updates: bool
-    admin_chat_id: int
+    admin_chat_ids: List[int]
 
 
-class DbCongig(BaseSettings, env_prefix="DB_"):
+class DbConfig(BaseSettings, env_prefix="POSTGRES_"):
     """
     Database related settings with build_url() method
     """
@@ -45,8 +46,8 @@ class DbCongig(BaseSettings, env_prefix="DB_"):
 
 class AppConfig(BaseModel):
     bot: BotConfig
-    db: DbCongig
+    db: DbConfig
 
 
 def create_config() -> AppConfig:
-    return AppConfig(bot=BotConfig(), db=DbCongig())
+    return AppConfig(bot=BotConfig(), db=DbConfig())

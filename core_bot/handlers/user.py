@@ -3,7 +3,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.types.callback_query import CallbackQuery
 
-from core.keyboards import (
+from core_bot.keyboards import (
     Location,
     MenuLocation,
     get_contacts_ikb,
@@ -11,8 +11,8 @@ from core.keyboards import (
     Information,
     MenuInformation,
 )
-from core.keyboards.user_kbs import get_main_menu_kb, DynamicKbBuilder, get_info_ikb
-from core.utils.text import (
+from core_bot.keyboards.user_kbs import get_main_menu_kb, DynamicKbBuilder, get_info_ikb
+from core_bot.utils.text import (
     MenuButtons,
     contact_text,
     info_text,

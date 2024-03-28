@@ -8,7 +8,7 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
 )
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
-from core.utils.text import MenuButtons
+from core_bot.utils.text import MenuButtons
 
 ####################
 # Common Keyboards #

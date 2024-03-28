@@ -26,7 +26,7 @@ class RequestsRepo:
 
 if __name__ == "__main__":
     from infrastructure.database.setup import create_session_pool
-    from bot.utils.config import AppConfig
+    from core_bot.utils.config import AppConfig
 
     async def example_usage(config: AppConfig):
         """

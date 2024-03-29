@@ -1,8 +1,8 @@
-from pydantic import SecretStr, BaseModel, Field
+from pydantic import SecretStr, BaseModel
 from pydantic_settings import BaseSettings as _BaseSettings
 from pydantic_settings import SettingsConfigDict
 from sqlalchemy import URL
-from typing import List, Any
+from typing import List
 
 
 class BaseSettings(_BaseSettings):
@@ -31,7 +31,6 @@ class DbConfig(BaseSettings, env_prefix="POSTGRES_"):
     password: SecretStr
     port: int
     user: str
-    data: str
 
     def build_url(self) -> URL:
         return URL.create(

@@ -10,6 +10,7 @@ from core_bot.utils.config import AppConfig, create_config
 from core_bot.middlewares import ConfigMiddleware, DatabaseMiddleware
 from core_bot.utils.broadcaster import broadcast
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
+from infrastructure.database.setup import create_engine, create_session_pool
 
 
 async def on_startup(bot: Bot, admin_ids: list[int]):
@@ -29,7 +30,7 @@ def register_global_middlewares(dp: Dispatcher, config: AppConfig, session_pool=
     """
     middleware_types = [
         ConfigMiddleware(config),
-        DatabaseMiddleware(session_pool),
+        # DatabaseMiddleware(session_pool),
     ]
 
     for middleware_type in middleware_types:
@@ -69,9 +70,11 @@ async def main() -> None:
     config: AppConfig = create_config()
     dp: Dispatcher = Dispatcher()
 
+    engine = create_engine(config.db, echo=True)
+    session_pool = create_session_pool(engine)
     dp.callback_query.middleware(CallbackAnswerMiddleware())
     dp.include_routers(user_router)
-
+    dp.update.outer_middleware(DatabaseMiddleware(session_pool))
     bot = Bot(
         token=config.bot.token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
@@ -80,7 +83,7 @@ async def main() -> None:
     await on_startup(bot, config.bot.admin_chat_ids)
     register_global_middlewares(dp, config)
 
-    # And the run events dispatching
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 

@@ -5,7 +5,7 @@ from core_bot.utils.config import DbConfig
 
 def create_engine(db: DbConfig, echo=False):
     engine = create_async_engine(
-        db.construct_sqlalchemy_url(),
+        db.build_url(),
         query_cache_size=1200,
         pool_size=20,
         max_overflow=200,

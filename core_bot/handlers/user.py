@@ -10,8 +10,15 @@ from core_bot.keyboards import (
     get_location_ikb,
     Information,
     MenuInformation,
+    MenuHelp,
+    Help,
 )
-from core_bot.keyboards.user_kbs import get_main_menu_kb, DynamicKbBuilder, get_info_ikb
+from core_bot.keyboards.user_kbs import (
+    get_main_menu_kb,
+    DynamicKbBuilder,
+    get_info_ikb,
+    get_help_ikb,
+)
 from core_bot.utils.text import (
     MenuButtons,
     contact_text,
@@ -21,6 +28,10 @@ from core_bot.utils.text import (
     location_second_text,
     adoption_text,
     found_text,
+    help_text,
+    help_finance,
+    help_material,
+    help_physical,
 )
 
 router = Router()
@@ -83,9 +94,29 @@ async def contacts_handler(message: Message):
     await message.answer(text=contact_text, reply_markup=ikb)
 
 
+# Help handlers
 @router.message(F.text == MenuButtons.help_.value)
 async def help_handler(message: Message):
-    await message.answer("тут має бути допомога")
+    ikb = await get_help_ikb()
+    await message.answer(text=help_text, reply_markup=ikb)
+
+
+@router.callback_query(MenuHelp.filter(F.help == Help.finance))
+async def finance_handler(query: CallbackQuery, callback_data: MenuHelp):
+    kb = await get_main_menu_kb()
+    await query.message.answer(help_finance, reply_markup=kb)
+
+
+@router.callback_query(MenuHelp.filter(F.help == Help.material))
+async def material_handler(query: CallbackQuery, callback_data: MenuHelp):
+    kb = await get_main_menu_kb()
+    await query.message.answer(help_material, reply_markup=kb)
+
+
+@router.callback_query(MenuHelp.filter(F.help == Help.physical))
+async def physical_handler(query: CallbackQuery, callback_data: MenuHelp):
+    kb = await get_main_menu_kb()
+    await query.message.answer(help_physical, reply_markup=kb)
 
 
 @router.callback_query(F.data == "menu_main")

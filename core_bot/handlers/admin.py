@@ -18,4 +18,4 @@ async def admin_start(message: Message):
 async def broadcast_handler(message: Message, repo: RequestsRepo):
     async for batch in repo.users.get_all_users():
         user_ids = [user.user_id for user in batch]
-        await broadcast(bot=message.bot, users=user_ids, text="test1")
+        await broadcast(bot=message.bot, users=user_ids, text="test2")

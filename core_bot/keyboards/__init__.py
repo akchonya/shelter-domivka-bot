@@ -7,6 +7,8 @@ from .user_kbs import (
     get_info_ikb,
     Information,
     MenuInformation,
+    MenuHelp,
+    Help,
 )
 
 __all__ = [
@@ -18,4 +20,6 @@ __all__ = [
     "get_info_ikb",
     "Information",
     "MenuInformation",
+    "MenuHelp",
+    "Help",
 ]

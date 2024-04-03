@@ -158,3 +158,31 @@ class DynamicKbBuilder:
         main_menu_button = await get_main_menu_button()
         builder.attach(main_menu_button)
         return builder.as_markup()
+
+
+###########
+# Help Kb #
+###########
+class Help(str, Enum):
+    finance = "Фінансова"
+    material = "Матеріальна "
+    physical = "Фізична"
+
+
+class MenuHelp(CallbackData, prefix="help"):
+    help: Help
+
+
+async def get_help_ikb():
+    builder = InlineKeyboardBuilder()
+    for help in Help:
+        builder.button(
+            text=help.value,
+            callback_data=MenuHelp(
+                help=help,
+            ),
+        )
+    main_menu_button = await get_main_menu_button()
+    builder.attach(main_menu_button)
+
+    return builder.as_markup()

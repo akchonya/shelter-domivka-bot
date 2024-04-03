@@ -1,41 +1,22 @@
 import asyncio
 import logging
 import sys
+
 import betterlogging as bl
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from core_bot.handlers.user import router as user_router
-from core_bot.utils.config import AppConfig, create_config
-from core_bot.middlewares import ConfigMiddleware, DatabaseMiddleware
-from core_bot.utils.broadcaster import broadcast
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
+
+from core_bot.handlers import routers_list
+from core_bot.middlewares import DatabaseMiddleware
+from core_bot.utils.broadcaster import broadcast
+from core_bot.utils.config import AppConfig, create_config
 from infrastructure.database.setup import create_engine, create_session_pool
 
 
 async def on_startup(bot: Bot, admin_ids: list[int]):
     await broadcast(bot, admin_ids, "Бот був запущений")
-
-
-def register_global_middlewares(dp: Dispatcher, config: AppConfig, session_pool=None):
-    """
-    Register global middlewares for the given dispatcher.
-    Global middlewares here are the ones that are applied to all the handlers (you specify the type of update)
-
-    :param dp: The dispatcher instance.
-    :type dp: Dispatcher
-    :param config: The configuration object from the loaded configuration.
-    :param session_pool: Optional session pool object for the database using SQLAlchemy.
-    :return: None
-    """
-    middleware_types = [
-        ConfigMiddleware(config),
-        # DatabaseMiddleware(session_pool),
-    ]
-
-    for middleware_type in middleware_types:
-        dp.message.outer_middleware(middleware_type)
-        dp.callback_query.outer_middleware(middleware_type)
 
 
 def setup_logging():
@@ -68,21 +49,22 @@ async def main() -> None:
     setup_logging()
 
     config: AppConfig = create_config()
-    dp: Dispatcher = Dispatcher()
+    bot: Bot = Bot(
+        token=config.core.token.get_secret_value(),
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+    )
+    dp: Dispatcher = Dispatcher(config=config)
 
     engine = create_engine(config.db, echo=True)
     session_pool = create_session_pool(engine)
+
+    dp.include_routers(*routers_list)
+
     dp.callback_query.middleware(CallbackAnswerMiddleware())
-    dp.include_routers(user_router)
-    dp.update.outer_middleware(DatabaseMiddleware(session_pool))
-    bot = Bot(
-        token=config.bot.token.get_secret_value(),
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-    )
+    dp.message.outer_middleware(DatabaseMiddleware(session_pool=session_pool))
+    dp.callback_query.outer_middleware(DatabaseMiddleware(session_pool=session_pool))
 
-    await on_startup(bot, config.bot.admin_chat_ids)
-    register_global_middlewares(dp, config)
-
+    await on_startup(bot, config.core.admin_chat_ids)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 

@@ -44,9 +44,9 @@ class DbConfig(BaseSettings, env_prefix="POSTGRES_"):
 
 
 class AppConfig(BaseModel):
-    bot: BotConfig
+    core: BotConfig
     db: DbConfig
 
 
 def create_config() -> AppConfig:
-    return AppConfig(bot=BotConfig(), db=DbConfig())
+    return AppConfig(core=BotConfig(), db=DbConfig())

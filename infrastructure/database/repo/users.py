@@ -1,6 +1,7 @@
 from typing import Optional
 
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import select, func
 
 from infrastructure.database.models import User
 from infrastructure.database.repo.base import BaseRepo
@@ -44,3 +45,18 @@ class UserRepo(BaseRepo):
 
         await self.session.commit()
         return result.scalar_one()
+
+    async def get_all_users(self, limit: int = 100):
+        """
+        Retrieves all users from the database with the specified limit.
+        :param limit: The maximum number of users to retrieve.
+        :return: An async generator yielding batches of User objects.
+        """
+        query_count = select(func.count(User.user_id))
+        total_users_count = await self.session.scalar(query_count)
+
+        for offset in range(0, total_users_count, limit):
+            query_batch = select(User).offset(offset).limit(limit)
+            result = await self.session.execute(query_batch)
+            users = result.scalars().all()
+            yield users

@@ -120,12 +120,12 @@ async def get_contacts_ikb():
         )
 
     # Add "Connect via bot" button
-    builder.row(
-        InlineKeyboardButton(
-            text="[TODO]",
-            callback_data="none",
-        )
-    )
+    # builder.row(
+    #     InlineKeyboardButton(
+    #         text="[TODO]",
+    #         callback_data="none",
+    #     )
+    # )
 
     main_menu = await get_main_menu_button()
 
